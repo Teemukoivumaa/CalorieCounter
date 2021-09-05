@@ -2,9 +2,10 @@
 A simple calorie counter app for Android</br>
 
 Calorie counter is an simple calorie counting app made for myself. Currently the app supports only dark theme but you can easily modify it to support light theme if you wish. Might come back later to do that myself and to also add in app way to change daily calorie goal.
-</br>
+</br></br>
 
-![AppPreview](/images/app_preview.jpeg)
+## App preview
+<img src="/images/app_preview.jpeg" width="453" height="914">
 
 ## Features
 
