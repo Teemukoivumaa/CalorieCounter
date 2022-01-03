@@ -1,15 +1,18 @@
 package com.teemukoivumaa.caloriecounter;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,7 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private static final String kcal = "kcal🔥";
-    private int kcalDailyGoal = 2242;
+    private int kcalDailyGoal;
+
+    private ActivityResultLauncher<Intent> settingsResultLauncher = null;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -27,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        inputCalories = findViewById(R.id.caloriesInput);
+        inputCalories = findViewById(R.id.newDailyGoal);
         totalCalories = findViewById(R.id.totalCalories);
         progressBar = findViewById(R.id.progressBar);
 
@@ -38,7 +43,35 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("CalorieCounter", 0);
         int storedCalories = pref.getInt("caloriesToday", 0);
+        kcalDailyGoal = pref.getInt("kcalDailyGoal", 2242);
         setTotalCalories(storedCalories);
+
+        settingsResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    kcalDailyGoal = pref.getInt("kcalDailyGoal", 2242);
+                    String totalCals = totalCalories.getText().toString();
+                    totalCals = totalCals.replaceFirst("/.*", "");
+
+                    setTotalCalories(Integer.parseInt(totalCals));
+                });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.settingsButton) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            settingsResultLauncher.launch(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void clearCalories(View view) {
