@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
         finish();
     }
 
-    public void storeCalories(int newGoal) {
+    private void storeCalories(int newGoal) {
         SharedPreferences pref = getApplicationContext().getSharedPreferences("CalorieCounter", 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("kcalDailyGoal", newGoal);

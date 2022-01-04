@@ -7,12 +7,12 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/calorieHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Calories eaten today:"
-        android:textColor="#FFFFFF"
+        android:layout_marginTop="64dp"
+        android:text="@string/calories_eaten_today"
+        android:textColor="?android:textColorPrimary"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,27 +24,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="0 kcal"
-        android:textColor="#FFFFFF"
+        android:text=""
+        android:textColor="?android:textColorPrimary"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/calorieHeader" />
 
-    <Button
-        android:id="@+id/clearCaloriesButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:onClick="clearCalories"
-        android:text="Clear calories"
-        android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ProgressBar
+        android:id="@+id/dailyProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="315dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:progressBackgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalCalories" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
+        android:id="@+id/newDailyInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -58,24 +58,24 @@
             android:id="@+id/newDailyGoal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Calories"
+            android:hint="@string/calories"
             android:inputType="number"
             android:singleLine="true"
-            android:textColor="#FFFFFF"
+            android:textColor="?android:textColorPrimary"
             android:textSize="24sp"
             android:max="100"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:progressBackgroundTint="@color/white"
-        android:layout_width="315dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
+    <Button
+        android:id="@+id/clearCaloriesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:onClick="clearCalories"
+        android:text="@string/clear_calories"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/totalCalories" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

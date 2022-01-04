@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">CalorieCounter</string>
     <string name="settings">Settings</string>
+    <string name="clear_calories">Clear calories</string>
+    <string name="calories">Calories</string>
+    <string name="change_daily_calorie_count">Change daily calorie count</string>
+    <string name="apply">Apply</string>
+    <string name="calories_eaten_today">Calories eaten today:</string>
+    <string name="daily_calories">Daily calories</string>
 </resources>
