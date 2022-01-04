@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> settingsResultLauncher = null;
 
-    @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,17 +33,17 @@ public class MainActivity extends AppCompatActivity {
 
         inputCalories = findViewById(R.id.newDailyGoal);
         totalCalories = findViewById(R.id.totalCalories);
-        progressBar = findViewById(R.id.progressBar);
-
-        inputCalories.setOnEditorActionListener((v, actionId, event) -> {
-            addCalories();
-            return true;
-        });
+        progressBar = findViewById(R.id.dailyProgressBar);
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("CalorieCounter", 0);
         int storedCalories = pref.getInt("caloriesToday", 0);
         kcalDailyGoal = pref.getInt("kcalDailyGoal", 2242);
         setTotalCalories(storedCalories);
+
+        inputCalories.setOnEditorActionListener((v, actionId, event) -> {
+            addCalories();
+            return true;
+        });
 
         settingsResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -79,8 +78,7 @@ public class MainActivity extends AppCompatActivity {
         storeCalories(0);
     }
 
-    @SuppressLint("DefaultLocale")
-    public void addCalories() {
+    private void addCalories() {
         int calories = Integer.parseInt(inputCalories.getText().toString());
 
         String totalCals = totalCalories.getText().toString();
@@ -93,12 +91,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("DefaultLocale")
-    public void setTotalCalories(int calories) {
+    private void setTotalCalories(int calories) {
         totalCalories.setText(String.format("%d/%d %s", calories, kcalDailyGoal, kcal));
         calculateCalorieProgress(calories);
     }
 
-    public void calculateCalorieProgress(int calories) {
+    private void calculateCalorieProgress(int calories) {
         if (calories <= 0) {
             progressBar.setProgress(0);
             return;
@@ -117,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setProgress(progress);
     }
 
-    public void storeCalories(int totalCalories) {
+    private void storeCalories(int totalCalories) {
         SharedPreferences pref = getApplicationContext().getSharedPreferences("CalorieCounter", 0);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("caloriesToday", totalCalories);
