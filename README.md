@@ -5,7 +5,7 @@ Calorie counter is an simple calorie counting app made for myself. Currently the
 </br></br>
 
 ## App apk link
-[Download app apk from GitHub](https://github.com/Teemukoivumaa/CalorieCounter/raw/main/CalorieCounter.apk) <br />
+[Download app apk from GitHub](https://github.com/Teemukoivumaa/CalorieCounter/releases/download/v1.2/CalorieCounter.apk) <br />
 
 ## App preview
 <img src="/images/app_preview.jpeg" width="453" height="914">
