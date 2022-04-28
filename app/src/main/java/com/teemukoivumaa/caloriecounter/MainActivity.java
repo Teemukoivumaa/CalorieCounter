@@ -13,6 +13,13 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +31,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String kcal = "kcal🔥";
     private int kcalDailyGoal;
 
-    private ActivityResultLauncher<Intent> settingsResultLauncher = null;
+    private ActivityResultLauncher<Intent> settingsResultLauncher;
+    private ActivityResultLauncher<Intent> progressResultLauncher;
+    private CalorieDAO calorieDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        progressResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {}
+                );
+
         settingsResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -54,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
 
                     setTotalCalories(Integer.parseInt(totalCals));
                 });
+
+        CalorieDatabase db = Room.databaseBuilder(
+                getApplicationContext(),
+                CalorieDatabase.class,
+                "calorie-counter"
+        ).allowMainThreadQueries().build();
+
+        calorieDAO = db.calorieDAO();
     }
 
     @Override
@@ -68,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, SettingsActivity.class);
             settingsResultLauncher.launch(intent);
             return true;
+        } else if (item.getItemId() == R.id.progressButton) {
+            Intent intent = new Intent(this, ProgressActivity.class);
+            progressResultLauncher.launch(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -79,10 +105,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addCalories() {
-        int calories = Integer.parseInt(inputCalories.getText().toString());
+        String inputText = inputCalories.getText().toString();
+        if (inputText.isEmpty()) return;
+
+        String firstChar = String.valueOf(inputText.charAt(0));
+        if (firstChar.equals("0")) return;
+
+        int calories = Integer.parseInt(inputText);
 
         String totalCals = totalCalories.getText().toString();
-        totalCals = totalCals.replace("/"+kcalDailyGoal+" "+kcal, "");
+        totalCals = totalCals.replace("/" + kcalDailyGoal + " " + kcal, "");
 
         int newTotalCals = Integer.parseInt(totalCals) + calories;
 
@@ -120,5 +152,39 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("caloriesToday", totalCalories);
         editor.apply();
+
+        String today = getCurrentDateLong();
+
+        if (checkIfShouldUpdate(today)) {
+            CalorieDay calorieDay = calorieDAO.getLastRecords(1).get(0);
+            calorieDay.setCalorieAmount(totalCalories);
+            calorieDAO.update(calorieDay);
+            return;
+        }
+
+        CalorieDay calorieDay = new CalorieDay();
+        calorieDay.setCalorieAmount(totalCalories);
+        calorieDay.setCalorieDate(today);
+        calorieDAO.insert(calorieDay);
+    }
+
+    private boolean checkIfShouldUpdate(String today) {
+        List<CalorieDay> calorieDays = calorieDAO.getLastRecords(1);
+        if (calorieDays.size() != 0) { // Check if size is zero & if data contains today's date
+            for (int i = 0; i < calorieDays.size(); i++) {
+                CalorieDay day = calorieDays.get(i);
+                if (day.getCalorieDate().equals(today)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String getCurrentDateLong() { // Get current date and return it. Example "2022-04-18"
+        Date currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("y-MM-d", Locale.ENGLISH);
+
+        return sdf.format(currentTime);
     }
 }

@@ -60,10 +60,10 @@
             android:layout_height="wrap_content"
             android:hint="@string/calories"
             android:inputType="number"
+            android:max="100"
             android:singleLine="true"
             android:textColor="?android:textColorPrimary"
-            android:textSize="24sp"
-            android:max="100"/>
+            android:textSize="24sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

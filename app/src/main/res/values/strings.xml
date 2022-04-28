@@ -7,4 +7,6 @@
     <string name="apply">Apply</string>
     <string name="calories_eaten_today">Calories eaten today:</string>
     <string name="daily_calories">Daily calories</string>
+    <string name="view_progress">View progress</string>
+    <string name="delete_all_data">Delete all data</string>
 </resources>
