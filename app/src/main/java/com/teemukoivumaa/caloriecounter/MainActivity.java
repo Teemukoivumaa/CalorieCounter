@@ -3,6 +3,7 @@ package com.teemukoivumaa.caloriecounter;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -134,14 +135,20 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (calories > kcalDailyGoal) {
+        if (calories >= kcalDailyGoal) {
             progressBar.setProgress(100);
             return;
         }
 
         float calculation = (float)calories / kcalDailyGoal;
-        String mainProgressValues = String.valueOf(calculation).substring(2,4);
+        int precision = 3;
+        if (String.valueOf(calculation).length() > 3) precision = 4;
 
+        String mainProgressValues = String.valueOf(calculation).substring(2, precision);
+
+        if (precision == 3) {
+            mainProgressValues += "0";
+        }
         int progress = Integer.parseInt(mainProgressValues);
 
         progressBar.setProgress(progress);

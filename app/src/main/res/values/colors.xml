@@ -7,4 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="Charcoal">#424B54</color>
+    <color name="Gunmetal">#2E3440</color>
+    <color name="BurntSienna">#EE6C4D</color>
+    <color name="BlackCoral">#606467</color>
 </resources>
