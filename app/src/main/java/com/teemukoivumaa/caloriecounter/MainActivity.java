@@ -24,6 +24,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final Utilities utilities = new Utilities();
+
     private TextView inputCalories;
     private TextView totalCalories;
 
@@ -160,7 +162,9 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("caloriesToday", totalCalories);
         editor.apply();
 
-        String today = getCurrentDateLong();
+        String today = utilities.getCurrentDate(
+                new SimpleDateFormat("y-MM-d", Locale.ENGLISH)
+        );
 
         if (checkIfShouldUpdate(today)) {
             CalorieDay calorieDay = calorieDAO.getLastRecords(1).get(0);
@@ -186,12 +190,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
-    }
-
-    private String getCurrentDateLong() { // Get current date and return it. Example "2022-04-18"
-        Date currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("y-MM-d", Locale.ENGLISH);
-
-        return sdf.format(currentTime);
     }
 }
