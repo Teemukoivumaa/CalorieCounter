@@ -3,7 +3,6 @@ package com.teemukoivumaa.caloriecounter;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,9 +15,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
+
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,13 +73,13 @@ public class MainActivity extends AppCompatActivity {
                     setTotalCalories(Integer.parseInt(totalCals));
                 });
 
-        CalorieDatabase db = Room.databaseBuilder(
+        CalorieDatabase calorieDatabase = Room.databaseBuilder(
                 getApplicationContext(),
                 CalorieDatabase.class,
-                "calorie-counter"
+                "CalorieDatabase"
         ).allowMainThreadQueries().build();
 
-        calorieDAO = db.calorieDAO();
+        calorieDAO = calorieDatabase.calorieDAO();
     }
 
     @Override

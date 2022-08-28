@@ -1,4 +1,4 @@
-package com.teemukoivumaa.caloriecounter;
+package com.teemukoivumaa.caloriecounter.Database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;

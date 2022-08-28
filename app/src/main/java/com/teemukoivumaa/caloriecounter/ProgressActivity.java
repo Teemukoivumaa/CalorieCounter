@@ -8,6 +8,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
