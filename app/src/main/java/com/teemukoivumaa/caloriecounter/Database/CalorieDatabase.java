@@ -1,9 +1,13 @@
-package com.teemukoivumaa.caloriecounter;
+package com.teemukoivumaa.caloriecounter.Database;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {CalorieDay.class}, version = 1)
+@Database(
+        version = 1,
+        entities = {CalorieDay.class},
+        exportSchema = false
+)
 public abstract class CalorieDatabase extends RoomDatabase {
     public abstract CalorieDAO calorieDAO();
 }

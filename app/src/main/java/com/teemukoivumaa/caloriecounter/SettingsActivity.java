@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
 
 public class SettingsActivity extends AppCompatActivity {
 
