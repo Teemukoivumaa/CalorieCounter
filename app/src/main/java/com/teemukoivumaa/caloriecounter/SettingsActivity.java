@@ -12,12 +12,16 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
+import com.teemukoivumaa.caloriecounter.Database.ProductDAO;
+import com.teemukoivumaa.caloriecounter.Database.ProductDatabase;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private TextView newDailyGoal;
 
     private CalorieDAO calorieDAO;
+    private ProductDAO productDAO;
+
     private Snackbar snackbar;
     private View contextView;
 
@@ -53,10 +57,16 @@ public class SettingsActivity extends AppCompatActivity {
         CalorieDatabase db = Room.databaseBuilder(
                 getApplicationContext(),
                 CalorieDatabase.class,
-                "calorie-counter"
+                "CalorieDatabase"
         ).allowMainThreadQueries().build();
-
         calorieDAO = db.calorieDAO();
+
+        ProductDatabase productDatabase = Room.databaseBuilder(
+                getApplicationContext(),
+                ProductDatabase.class,
+                "ProductDatabase"
+        ).allowMainThreadQueries().build();
+        productDAO = productDatabase.productDAO();
     }
 
     public void deleteAllQuestion(View view) {
@@ -78,6 +88,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void deleteAll() {
         calorieDAO.deleteALL();
+        productDAO.deleteALL();
+
         Snackbar snackbar = Snackbar
                 .make(contextView, "All data deleted.", Snackbar.LENGTH_LONG);
         snackbar.show();

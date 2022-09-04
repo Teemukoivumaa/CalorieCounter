@@ -11,6 +11,9 @@ public interface ProductDAO {
     @Query("SELECT * FROM CalorieProduct")
     List<CalorieProduct> getAll();
 
+    @Query("DELETE FROM CalorieProduct")
+    void deleteALL();
+
     @Insert
     void insert(CalorieProduct calorieProduct);
 

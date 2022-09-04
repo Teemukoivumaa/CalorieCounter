@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/progressButton"
-        android:icon="@drawable/progress"
+        android:icon="@drawable/progress_bars"
         android:title="@string/view_progress"
         app:showAsAction="ifRoom"/>
 
