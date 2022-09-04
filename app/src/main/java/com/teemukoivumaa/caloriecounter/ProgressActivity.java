@@ -61,7 +61,7 @@ public class ProgressActivity extends AppCompatActivity {
         CalorieDatabase db = Room.databaseBuilder(
                 getApplicationContext(),
                 CalorieDatabase.class,
-                "calorie-counter"
+                "CalorieDatabase"
         ).allowMainThreadQueries().build();
 
         calorieDAO = db.calorieDAO();

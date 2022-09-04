@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> settingsResultLauncher;
     private ActivityResultLauncher<Intent> progressResultLauncher;
+    private ActivityResultLauncher<Intent> productsResultLauncher;
     private CalorieDAO calorieDAO;
 
     @Override
@@ -62,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {}
                 );
+
+        productsResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {}
+        );
 
         settingsResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -106,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
     public void clearCalories(View view) {
         setTotalCalories(0);
         storeCalories(0);
+    }
+
+    public void addItems(View view) {
+        Intent intent = new Intent(this, ProductActivity.class);
+        productsResultLauncher.launch(intent);
     }
 
     private void addCalories() {
