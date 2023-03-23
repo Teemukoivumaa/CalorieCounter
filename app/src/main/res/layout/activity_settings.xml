@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:backgroundTint="@color/BitterSweet"
         android:onClick="deleteAllQuestion"
         android:text="@string/delete_all_data"
         android:textColor="@color/white"
@@ -65,11 +66,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
+        android:backgroundTint="@color/ColumbiaBlue"
         android:onClick="applyChanges"
         android:text="@string/apply"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:rippleColor="@color/ColumbiaBlue" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

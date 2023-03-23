@@ -1,5 +1,8 @@
 package com.teemukoivumaa.caloriecounter;
 
+import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -82,5 +85,25 @@ public class Utilities {
             }
         }
         return max;
+    }
+    /**Check if today's date exists in the calorie database
+     * @param calorieDAO The calorie day database.
+     * @return Returns true if today's date exists. Returns false if it doesn't.
+     */
+    public boolean todayCalorieDayExists(CalorieDAO calorieDAO) {
+        String today = getCurrentDate(
+                new SimpleDateFormat("y-MM-d", Locale.ENGLISH)
+        );
+
+        List<CalorieDay> calorieDays = calorieDAO.getLastRecords(1);
+        if (calorieDays.size() != 0) { // Check if size is zero & if data contains today's date
+            for (int i = 0; i < calorieDays.size(); i++) {
+                CalorieDay day = calorieDays.get(i);
+                if (day.getCalorieDate().equals(today)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

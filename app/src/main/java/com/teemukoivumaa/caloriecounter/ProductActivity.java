@@ -1,8 +1,11 @@
 package com.teemukoivumaa.caloriecounter;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.room.Room;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,16 +15,24 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
+import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
 import com.teemukoivumaa.caloriecounter.Database.CalorieProduct;
 import com.teemukoivumaa.caloriecounter.Database.ProductDAO;
 import com.teemukoivumaa.caloriecounter.Database.ProductDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductActivity extends AppCompatActivity {
 
     private ProductDAO productDAO;
+    private CalorieDAO calorieDAO;
+    private final Utilities utilities = new Utilities();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +46,17 @@ public class ProductActivity extends AppCompatActivity {
         ).allowMainThreadQueries().build();
         productDAO = productDatabase.productDAO();
 
+        CalorieDatabase calorieDatabase = Room.databaseBuilder(
+                getApplicationContext(),
+                CalorieDatabase.class,
+                "CalorieDatabase"
+        ).allowMainThreadQueries().build();
+        calorieDAO = calorieDatabase.calorieDAO();
+
         createTable();
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void createTable() {
         TableLayout productTable = findViewById(R.id.productTableLayout);
         TableRow headerRow = new TableRow(this);
@@ -69,6 +88,7 @@ public class ProductActivity extends AppCompatActivity {
         createTable();
     }
 
+    @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     private void populateTable(TableLayout productTable) {
         List<CalorieProduct> products = productDAO.getAll();
 
@@ -135,11 +155,54 @@ public class ProductActivity extends AppCompatActivity {
         productDAO.insert(calorieProduct);
     }
 
+    private void editProduct(CalorieProduct calorieProduct) {
+        productDAO.update(calorieProduct);
+    }
+
+    private void deleteProduct(int calorieProductId) {
+        productDAO.deleteById(calorieProductId);
+        rebuildTable();
+    }
+
+    private void addCalories(int calorieAmount) {
+        int newCalorieAmount = calorieAmount;
+
+        if (utilities.todayCalorieDayExists(calorieDAO)) {
+            CalorieDay calorieDay = calorieDAO.getLastRecords(1).get(0);
+            int currentCalorieAmount = calorieDay.getCalorieAmount();
+            newCalorieAmount = currentCalorieAmount + calorieAmount;
+            calorieDay.setCalorieAmount(newCalorieAmount);
+            calorieDAO.update(calorieDay);
+        } else {
+            CalorieDay calorieDay = new CalorieDay();
+            calorieDay.setCalorieAmount(calorieAmount);
+            calorieDay.setCalorieDate(
+                    utilities.getCurrentDate(new SimpleDateFormat("y-MM-d", Locale.ENGLISH)
+                    )
+            );
+            calorieDAO.insert(calorieDay);
+        }
+
+        View contextView = this.findViewById(android.R.id.content);
+        @SuppressLint("DefaultLocale") Snackbar snackbar = Snackbar
+                .make(contextView, String.format("New calorie amount: %d", newCalorieAmount), Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
     private void showProductPopup(CalorieProduct calorieProduct) {
-        MaterialAlertDialogBuilder productPopup = new MaterialAlertDialogBuilder(this, R.style.RoundShapePopup)
+        final Drawable deleteIcon = AppCompatResources.getDrawable(this, R.drawable.delete);
+        final Drawable addIcon = AppCompatResources.getDrawable(this, R.drawable.add_one);
+        final Drawable editIcon = AppCompatResources.getDrawable(this, R.drawable.edit);
+
+        MaterialAlertDialogBuilder productPopup = new MaterialAlertDialogBuilder(this, R.style.EditPopup)
                 .setTitle("Product")
                 .setMessage("View product info, modify it or delete it.")
-                .setNeutralButton("DELETE", (dialogInterface, i) -> { });
+                .setPositiveButtonIcon(addIcon)
+                .setPositiveButton("", (dialogInterface, i) -> addCalories(calorieProduct.getCalorieAmount()))
+                .setNeutralButtonIcon(deleteIcon)
+                .setNeutralButton("", (dialogInterface, i) -> showDeleteProductPopup(calorieProduct.getId()))
+                .setNegativeButtonIcon(editIcon)
+                .setNegativeButton("", (dialogInterface, i) -> showEditProductPopup(calorieProduct));
 
         final View dialogView = LayoutInflater.from(productPopup.getContext()).inflate(R.layout.popup_product, null);
 
@@ -150,16 +213,23 @@ public class ProductActivity extends AppCompatActivity {
 
         TextView nameTextView = dialogView.findViewById(R.id.productName);
         TextView amountTextView = dialogView.findViewById(R.id.productAmount);
-        TextView prefixTextView = dialogView.findViewById(R.id.productPrefix);
         TextView caloriesTextView = dialogView.findViewById(R.id.productCalories);
 
         nameTextView.setText(productName);
-        amountTextView.setText(productAmount);
-        prefixTextView.setText(productPrefix);
+        amountTextView.setText(String.format("%s%s", productAmount, productPrefix));
         caloriesTextView.setText(productCalories);
 
         productPopup.setView(dialogView);
         productPopup.show();
+    }
+
+    public void showDeleteProductPopup(int calorieProductId) {
+         new MaterialAlertDialogBuilder(this, R.style.DeletePopup)
+                 .setTitle("Are you sure?")
+                 .setMessage("View product info, modify it or delete it.")
+                 .setPositiveButton("DELETE", (dialogInterface, i) -> deleteProduct(calorieProductId))
+                 .setNeutralButton("CANCEL", (dialogInterface, i) -> {})
+                 .show();
     }
 
     public void showAddProductPopup(View view) {
@@ -181,10 +251,65 @@ public class ProductActivity extends AppCompatActivity {
             String productAmount = productAmountInput.getText().toString();
             String productPrefix = productPrefixInput.getText().toString();
             String productCalories = productCaloriesInput.getText().toString();
-
-            addProduct(productName, Integer.parseInt(productAmount), productPrefix, Integer.parseInt(productCalories));
-            rebuildTable();
+            if (productName.isEmpty() || productAmount.isEmpty() || productPrefix.isEmpty() || productCalories.isEmpty()) {
+                View contextView = this.findViewById(android.R.id.content);
+                Snackbar snackbar = Snackbar.make(
+                        contextView,
+                        "Couldn't add to database\nPlease make sure you fill every field",
+                        Snackbar.LENGTH_LONG
+                );
+                snackbar.show();
+            } else {
+                addProduct(productName, Integer.parseInt(productAmount), productPrefix, Integer.parseInt(productCalories));
+                rebuildTable();
+            }
         });
         addProductPopup.show();
+    }
+
+    public void showEditProductPopup(CalorieProduct calorieProduct) {
+
+        MaterialAlertDialogBuilder editProductPopup = new MaterialAlertDialogBuilder(this, R.style.RoundShapePopup)
+                .setTitle("Edit product")
+                .setMessage("Modify the info for the product.")
+                .setNeutralButton("CANCEL", (dialogInterface, i) -> { });
+
+        final View dialogView = LayoutInflater.from(editProductPopup.getContext()).inflate(R.layout.popup_add_product, null);
+
+        TextView productNameInput = dialogView.findViewById(R.id.productNameInput);
+        TextView productAmountInput = dialogView.findViewById(R.id.productAmountInput);
+        TextView productPrefixInput = dialogView.findViewById(R.id.productPrefixInput);
+        TextView productCaloriesInput = dialogView.findViewById(R.id.productCaloriesInput);
+
+        productNameInput.setText(calorieProduct.getProductName());
+        productAmountInput.setText(String.valueOf(calorieProduct.getProductAmount()));
+        productPrefixInput.setText(calorieProduct.getAmountPrefix());
+        productCaloriesInput.setText(String.valueOf(calorieProduct.getCalorieAmount()));
+
+        editProductPopup.setView(dialogView);
+        editProductPopup.setPositiveButton("MODIFY PRODUCT", (dialogInterface, i) -> {
+            String productName = productNameInput.getText().toString();
+            String productAmount = productAmountInput.getText().toString();
+            String productPrefix = productPrefixInput.getText().toString();
+            String productCalories = productCaloriesInput.getText().toString();
+            if (productName.isEmpty() || productAmount.isEmpty() || productPrefix.isEmpty() || productCalories.isEmpty()) {
+                View contextView = this.findViewById(android.R.id.content);
+                Snackbar snackbar = Snackbar.make(
+                        contextView,
+                        "Couldn't save modified version to database\nPlease make sure you fill every field",
+                        Snackbar.LENGTH_LONG
+                );
+                snackbar.show();
+            } else {
+                calorieProduct.setProductName(productName);
+                calorieProduct.setProductAmount(Integer.parseInt(productAmount));
+                calorieProduct.setAmountPrefix(productPrefix);
+                calorieProduct.setCalorieAmount(Integer.parseInt(productCalories));
+
+                editProduct(calorieProduct);
+                rebuildTable();
+            }
+        });
+        editProductPopup.show();
     }
 }

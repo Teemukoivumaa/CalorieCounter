@@ -16,5 +16,12 @@
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="backgroundTint">@color/HunterGreen</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:layout_marginRight">3dp</item>
+    </style>
+
+    <style name="DeleteButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="backgroundTint">@color/BitterSweet</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_marginRight">3dp</item>
     </style>
 </resources>
