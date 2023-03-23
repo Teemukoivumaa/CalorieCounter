@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -20,7 +21,6 @@ import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,14 +45,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        CalorieDatabase calorieDatabase = Room.databaseBuilder(
+                getApplicationContext(),
+                CalorieDatabase.class,
+                "CalorieDatabase"
+        ).allowMainThreadQueries().build();
+        calorieDAO = calorieDatabase.calorieDAO();
+
         inputCalories = findViewById(R.id.newDailyGoal);
         totalCalories = findViewById(R.id.totalCalories);
         progressBar = findViewById(R.id.dailyProgressBar);
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("CalorieCounter", 0);
-        int storedCalories = pref.getInt("caloriesToday", 0);
         kcalDailyGoal = pref.getInt("kcalDailyGoal", 2242);
-        setTotalCalories(storedCalories);
+
+        if (utilities.todayCalorieDayExists(calorieDAO)) {
+            int storedCalories = pref.getInt("caloriesToday", 0);
+            setTotalCalories(storedCalories);
+        } else {
+            setTotalCalories(0);
+            storeCalories(0);
+        }
 
         inputCalories.setOnEditorActionListener((v, actionId, event) -> {
             addCalories();
@@ -66,7 +79,13 @@ public class MainActivity extends AppCompatActivity {
 
         productsResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> {}
+                result -> {
+                    if (utilities.todayCalorieDayExists(calorieDAO)) {
+                        CalorieDay calorieDay = calorieDAO.getLastRecords(1).get(0);
+                        int currentCalorieAmount = calorieDay.getCalorieAmount();
+                        setTotalCalories(currentCalorieAmount);
+                    }
+                }
         );
 
         settingsResultLauncher = registerForActivityResult(
@@ -78,18 +97,10 @@ public class MainActivity extends AppCompatActivity {
 
                     setTotalCalories(Integer.parseInt(totalCals));
                 });
-
-        CalorieDatabase calorieDatabase = Room.databaseBuilder(
-                getApplicationContext(),
-                CalorieDatabase.class,
-                "CalorieDatabase"
-        ).allowMainThreadQueries().build();
-
-        calorieDAO = calorieDatabase.calorieDAO();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         getMenuInflater().inflate(R.menu.top_bar, menu);
         return true;
     }
@@ -104,14 +115,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ProgressActivity.class);
             progressResultLauncher.launch(intent);
             return true;
+        } else if (item.getItemId() == R.id.deleteButton) {
+            setTotalCalories(0);
+            storeCalories(0);
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void clearCalories(View view) {
-        setTotalCalories(0);
-        storeCalories(0);
     }
 
     public void addItems(View view) {
@@ -174,33 +183,18 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("caloriesToday", totalCalories);
         editor.apply();
 
-        String today = utilities.getCurrentDate(
-                new SimpleDateFormat("y-MM-d", Locale.ENGLISH)
-        );
-
-        if (checkIfShouldUpdate(today)) {
+        if (utilities.todayCalorieDayExists(calorieDAO)) {
             CalorieDay calorieDay = calorieDAO.getLastRecords(1).get(0);
             calorieDay.setCalorieAmount(totalCalories);
             calorieDAO.update(calorieDay);
-            return;
+        } else {
+            CalorieDay calorieDay = new CalorieDay();
+            calorieDay.setCalorieAmount(totalCalories);
+            calorieDay.setCalorieDate(utilities.getCurrentDate(
+                    new SimpleDateFormat("y-MM-d", Locale.ENGLISH)
+                )
+            );
+            calorieDAO.insert(calorieDay);
         }
-
-        CalorieDay calorieDay = new CalorieDay();
-        calorieDay.setCalorieAmount(totalCalories);
-        calorieDay.setCalorieDate(today);
-        calorieDAO.insert(calorieDay);
-    }
-
-    private boolean checkIfShouldUpdate(String today) {
-        List<CalorieDay> calorieDays = calorieDAO.getLastRecords(1);
-        if (calorieDays.size() != 0) { // Check if size is zero & if data contains today's date
-            for (int i = 0; i < calorieDays.size(); i++) {
-                CalorieDay day = calorieDays.get(i);
-                if (day.getCalorieDate().equals(today)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

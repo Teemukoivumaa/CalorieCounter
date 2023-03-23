@@ -4,9 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_product.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_progress.xml" value="0.1" />
         <entry key="app/src/main/res/layout/add_product.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/popup_add_product.xml" value="0.17325227963525835" />
-        <entry key="app/src/main/res/layout/popup_product.xml" value="0.17274569402228976" />
+        <entry key="app/src/main/res/layout/popup_product.xml" value="0.25" />
       </map>
     </option>
   </component>

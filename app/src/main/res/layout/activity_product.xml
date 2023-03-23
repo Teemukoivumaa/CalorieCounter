@@ -47,6 +47,7 @@
         android:layout_marginBottom="24dp"
         android:clickable="true"
         android:onClick="showAddProductPopup"
+        app:backgroundTint="@color/ColumbiaBlue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

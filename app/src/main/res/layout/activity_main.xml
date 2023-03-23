@@ -49,10 +49,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="224dp"
         android:textColorHint="@color/white"
         app:hintTextColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/clearCaloriesButton"
+        app:layout_constraintBottom_toTopOf="@+id/addItemsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -70,25 +70,14 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/clearCaloriesButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
-        android:onClick="clearCalories"
-        android:text="@string/clear_calories"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/addItemsButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
         android:id="@+id/addItemsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="64dp"
+        android:backgroundTint="@color/ColumbiaBlue"
         android:onClick="addItems"
         android:text="add items"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
