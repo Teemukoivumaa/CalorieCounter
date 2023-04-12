@@ -2,9 +2,12 @@ package com.teemukoivumaa.caloriecounter;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
@@ -26,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        setTitle("Settings");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         newDailyGoal = findViewById(R.id.newDailyGoal);
 
@@ -51,6 +56,20 @@ public class SettingsActivity extends AppCompatActivity {
                 "ProductDatabase"
         ).allowMainThreadQueries().build();
         productDAO = productDatabase.productDAO();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        return true;
     }
 
     public void deleteAllQuestion(View view) {
