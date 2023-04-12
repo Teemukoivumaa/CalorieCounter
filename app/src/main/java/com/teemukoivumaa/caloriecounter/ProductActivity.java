@@ -1,5 +1,6 @@
 package com.teemukoivumaa.caloriecounter;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.room.Room;
@@ -9,6 +10,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -38,6 +41,8 @@ public class ProductActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
+        setTitle("Products");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ProductDatabase productDatabase = Room.databaseBuilder(
                 getApplicationContext(),
@@ -54,6 +59,20 @@ public class ProductActivity extends AppCompatActivity {
         calorieDAO = calorieDatabase.calorieDAO();
 
         createTable();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        return true;
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
