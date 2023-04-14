@@ -1,10 +1,13 @@
 package com.teemukoivumaa.caloriecounter;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +41,8 @@ public class ProductActivity extends AppCompatActivity {
     private ProductHistoryDAO productHistoryDAO;
     private final Utilities utilities = new Utilities();
 
+    private ActivityResultLauncher<Intent> progressResultLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,11 @@ public class ProductActivity extends AppCompatActivity {
         productHistoryDAO = appDatabase.productHistoryDAO();
 
         createTable();
+
+        progressResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {}
+        );
     }
 
     @Override
@@ -58,12 +68,17 @@ public class ProductActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
+        } else if (item.getItemId() == R.id.historyButton) {
+            Intent intent = new Intent(this, ProductHistoryActivity.class);
+            progressResultLauncher.launch(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        getMenuInflater().inflate(R.menu.product_activity_top_bar, menu);
         return true;
     }
 
@@ -213,7 +228,17 @@ public class ProductActivity extends AppCompatActivity {
                 .setTitle("Product")
                 .setMessage("View product info, modify it or delete it.")
                 .setPositiveButtonIcon(addIcon)
-                .setPositiveButton("", (dialogInterface, i) -> addCalories(calorieProduct.getCalorieAmount()))
+                .setPositiveButton("", (dialogInterface, i) -> {
+                    addCalories(calorieProduct.getCalorieAmount());
+                    ProductHistory productHistory = new ProductHistory();
+                    productHistory.setProductName(calorieProduct.getProductName());
+                    productHistory.setAmount(String.format("%s%s", productAmount, productPrefix));
+                    productHistory.setCalorieAmount(calorieProduct.calorieAmount);
+                    productHistory.setProductDate(
+                            utilities.getCurrentDate(new SimpleDateFormat("y-MM-d", Locale.ENGLISH))
+                    );
+                    productHistoryDAO.insert(productHistory);
+                })
                 .setNeutralButtonIcon(deleteIcon)
                 .setNeutralButton("", (dialogInterface, i) -> showDeleteProductPopup(calorieProduct.getId()))
                 .setNegativeButtonIcon(editIcon)

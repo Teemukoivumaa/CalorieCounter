@@ -56,4 +56,6 @@ public class ProductHistory {
     public void setProductDate(String productDate) {
         this.productDate = productDate;
     }
+
+    public String getProductDate() { return productDate; }
 }

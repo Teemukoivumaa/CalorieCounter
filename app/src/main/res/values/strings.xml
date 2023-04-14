@@ -9,4 +9,5 @@
     <string name="daily_calories">Daily calories</string>
     <string name="view_progress">View progress</string>
     <string name="delete_all_data">Delete all data</string>
+    <string name="view_history">View history</string>
 </resources>
