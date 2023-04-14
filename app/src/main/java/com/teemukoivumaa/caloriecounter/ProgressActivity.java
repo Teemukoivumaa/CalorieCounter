@@ -6,10 +6,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
+import com.teemukoivumaa.caloriecounter.Database.AppDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
-import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
 
 import java.text.SimpleDateFormat;
@@ -58,13 +57,9 @@ public class ProgressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
 
-        CalorieDatabase db = Room.databaseBuilder(
-                getApplicationContext(),
-                CalorieDatabase.class,
-                "CalorieDatabase"
-        ).allowMainThreadQueries().build();
+        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
 
-        calorieDAO = db.calorieDAO();
+        calorieDAO = appDatabase.calorieDAO();
         getProgressData();
         getScreenItems();
 

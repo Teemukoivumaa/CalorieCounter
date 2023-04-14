@@ -3,7 +3,6 @@ package com.teemukoivumaa.caloriecounter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.room.Room;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
@@ -19,12 +18,13 @@ import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.teemukoivumaa.caloriecounter.Database.AppDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
-import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
 import com.teemukoivumaa.caloriecounter.Database.CalorieProduct;
 import com.teemukoivumaa.caloriecounter.Database.ProductDAO;
-import com.teemukoivumaa.caloriecounter.Database.ProductDatabase;
+import com.teemukoivumaa.caloriecounter.Database.ProductHistory;
+import com.teemukoivumaa.caloriecounter.Database.ProductHistoryDAO;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -35,6 +35,7 @@ public class ProductActivity extends AppCompatActivity {
 
     private ProductDAO productDAO;
     private CalorieDAO calorieDAO;
+    private ProductHistoryDAO productHistoryDAO;
     private final Utilities utilities = new Utilities();
 
     @Override
@@ -44,19 +45,10 @@ public class ProductActivity extends AppCompatActivity {
         setTitle("Products");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ProductDatabase productDatabase = Room.databaseBuilder(
-                getApplicationContext(),
-                ProductDatabase.class,
-                "ProductDatabase"
-        ).allowMainThreadQueries().build();
-        productDAO = productDatabase.productDAO();
-
-        CalorieDatabase calorieDatabase = Room.databaseBuilder(
-                getApplicationContext(),
-                CalorieDatabase.class,
-                "CalorieDatabase"
-        ).allowMainThreadQueries().build();
-        calorieDAO = calorieDatabase.calorieDAO();
+        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+        productDAO = appDatabase.productDAO();
+        calorieDAO = appDatabase.calorieDAO();
+        productHistoryDAO = appDatabase.productHistoryDAO();
 
         createTable();
     }
@@ -196,8 +188,7 @@ public class ProductActivity extends AppCompatActivity {
             CalorieDay calorieDay = new CalorieDay();
             calorieDay.setCalorieAmount(calorieAmount);
             calorieDay.setCalorieDate(
-                    utilities.getCurrentDate(new SimpleDateFormat("y-MM-d", Locale.ENGLISH)
-                    )
+                    utilities.getCurrentDate(new SimpleDateFormat("y-MM-d", Locale.ENGLISH))
             );
             calorieDAO.insert(calorieDay);
         }
@@ -213,6 +204,11 @@ public class ProductActivity extends AppCompatActivity {
         final Drawable addIcon = AppCompatResources.getDrawable(this, R.drawable.add_one);
         final Drawable editIcon = AppCompatResources.getDrawable(this, R.drawable.edit);
 
+        String productName = calorieProduct.productName;
+        String productAmount = Integer.toString(calorieProduct.productAmount);
+        String productPrefix = calorieProduct.amountPrefix;
+        String productCalories = Integer.toString(calorieProduct.calorieAmount);
+
         MaterialAlertDialogBuilder productPopup = new MaterialAlertDialogBuilder(this, R.style.EditPopup)
                 .setTitle("Product")
                 .setMessage("View product info, modify it or delete it.")
@@ -224,11 +220,6 @@ public class ProductActivity extends AppCompatActivity {
                 .setNegativeButton("", (dialogInterface, i) -> showEditProductPopup(calorieProduct));
 
         final View dialogView = LayoutInflater.from(productPopup.getContext()).inflate(R.layout.popup_product, null);
-
-        String productName = calorieProduct.productName;
-        String productAmount = Integer.toString(calorieProduct.productAmount);
-        String productPrefix = calorieProduct.amountPrefix;
-        String productCalories = Integer.toString(calorieProduct.calorieAmount);
 
         TextView nameTextView = dialogView.findViewById(R.id.productName);
         TextView amountTextView = dialogView.findViewById(R.id.productAmount);

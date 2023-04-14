@@ -14,10 +14,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
+import com.teemukoivumaa.caloriecounter.Database.AppDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
-import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDay;
 
 import java.text.SimpleDateFormat;
@@ -45,12 +44,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CalorieDatabase calorieDatabase = Room.databaseBuilder(
-                getApplicationContext(),
-                CalorieDatabase.class,
-                "CalorieDatabase"
-        ).allowMainThreadQueries().build();
-        calorieDAO = calorieDatabase.calorieDAO();
+        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+        calorieDAO = appDatabase.calorieDAO();
 
         inputCalories = findViewById(R.id.newDailyGoal);
         totalCalories = findViewById(R.id.totalCalories);

@@ -9,14 +9,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.teemukoivumaa.caloriecounter.Database.AppDatabase;
 import com.teemukoivumaa.caloriecounter.Database.CalorieDAO;
-import com.teemukoivumaa.caloriecounter.Database.CalorieDatabase;
 import com.teemukoivumaa.caloriecounter.Database.ProductDAO;
-import com.teemukoivumaa.caloriecounter.Database.ProductDatabase;
+import com.teemukoivumaa.caloriecounter.Database.ProductHistoryDAO;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -24,6 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private CalorieDAO calorieDAO;
     private ProductDAO productDAO;
+    private ProductHistoryDAO productHistoryDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +43,10 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         });
 
-        CalorieDatabase db = Room.databaseBuilder(
-                getApplicationContext(),
-                CalorieDatabase.class,
-                "CalorieDatabase"
-        ).allowMainThreadQueries().build();
-        calorieDAO = db.calorieDAO();
-
-        ProductDatabase productDatabase = Room.databaseBuilder(
-                getApplicationContext(),
-                ProductDatabase.class,
-                "ProductDatabase"
-        ).allowMainThreadQueries().build();
-        productDAO = productDatabase.productDAO();
+        AppDatabase appDatabase = AppDatabase.getInstance(getApplicationContext());
+        calorieDAO = appDatabase.calorieDAO();
+        productDAO = appDatabase.productDAO();
+        productHistoryDAO = appDatabase.productHistoryDAO();
     }
 
     @Override
@@ -93,6 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void deleteAll() {
         calorieDAO.deleteALL();
         productDAO.deleteALL();
+        productHistoryDAO.deleteALL();
 
         View contextView = this.findViewById(android.R.id.content);
         Snackbar snackbar = Snackbar
